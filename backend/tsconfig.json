@@ -1,0 +1,15 @@
+// tsconfig.json (Các thiết lập quan trọng)
+{
+  "compilerOptions": {
+    "target": "es2020",         /* Phiên bản ECMAScript target cho mã đầu ra (phổ biến là es2020 hoặc esnext) */
+    "module": "commonjs",       /* Hệ thống module đầu ra (Node.js thường dùng commonjs) */
+    "outDir": "./dist",         /* Thư mục đầu ra chứa các file .js đã build */
+    "rootDir": "./",            /* Thư mục chứa các file .ts nguồn */
+    "esModuleInterop": true,    /* Cho phép import/export theo kiểu ES6 */
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "include": ["**/*.ts"],       /* Chỉ định các file cần build */
+  "exclude": ["node_modules"]   /* Loại trừ thư mục không cần build */
+}
