@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { updateEmployeeDb, insertEmployeeDb, deleteEmployeeDb } from '../services/employeeService';
+import { updateEmployeeDb, insertEmployeeDb, deleteEmployeeDb, getAllEmployeeDb } from '../services/employeeService';
 import { EmployeeData } from '../interfaces/employee.interface';
 
 export async function updateEmployee(req: Request, res: Response): Promise<void> {
@@ -144,5 +144,15 @@ export async function deleteEmployee(req: Request, res: Response): Promise<void>
         }
 
         res.status(400).json({ message: msg });
+    }
+}
+
+export async function getAllEmployees(req: Request, res: Response): Promise<void> {
+    try {
+        const employees = await getAllEmployeeDb();
+        res.status(200).json(employees);
+    } catch (err: any) {
+        console.error("Lỗi trong Controller khi lấy danh sách nhân viên:", err.message);
+        res.status(500).json({ message: "Lỗi hệ thống" });
     }
 }

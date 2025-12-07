@@ -1,4 +1,5 @@
 import express, {Express} from 'express';
+import cors from 'cors';
 import { connectDB } from './db';
 import employeeRoute from './src/routes/employeeRoute';
 import orderRoute from './src/routes/orderRoute';
@@ -7,6 +8,8 @@ import customerRoute from './src/routes/customerRoute';
 
 const app: Express = express();
 const PORT = process.env.PORT || 5173;
+
+app.use(cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

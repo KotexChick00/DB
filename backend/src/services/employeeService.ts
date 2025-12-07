@@ -69,3 +69,20 @@ export async function deleteEmployeeDb(userID: number): Promise<number> {
         throw err;
     }
 }
+
+export async function getAllEmployeeDb(): Promise<any[]> {
+    try {
+        const pool = await connectDB();
+        const request = pool.request();
+        const result = await request.query(`
+        SELECT * FROM Employee;
+    `);
+
+        return result.recordset;
+    }
+
+    catch (err) {
+        console.error('Error fetching all employees:', err);
+        throw err;
+    }
+}
