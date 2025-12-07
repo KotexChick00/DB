@@ -1,4 +1,4 @@
-export interface EmployeeUpdateData {
+export interface EmployeeData {
     UserID: number;
     RestaurantID: number;
     Salary: number;
@@ -6,3 +6,4 @@ export interface EmployeeUpdateData {
     SupervisorID: number | null;
     EmployeeType: string;
 }
+

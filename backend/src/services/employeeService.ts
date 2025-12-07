@@ -1,8 +1,8 @@
 import { connectDB } from "../../db";
 import * as sql from 'mssql';
-import { EmployeeUpdateData } from "../interfaces/employee.interface";
+import { EmployeeData } from "../interfaces/employee.interface";
 
-export async function updateEmployeeDb(employeeData: EmployeeUpdateData): Promise<number> {
+export async function updateEmployeeDb(employeeData: EmployeeData): Promise<number> {
     const { UserID, RestaurantID, Salary, HireDate, SupervisorID, EmployeeType } = employeeData;
 
     try {
@@ -20,14 +20,52 @@ export async function updateEmployeeDb(employeeData: EmployeeUpdateData): Promis
 
         const result = await request.execute('sp_UpdateEmployee');
 
-        console.log("DEBUG DB RESULT:", JSON.stringify(result, null, 2));
-
         const rows = result.recordset?.[0]?.RowsAffected ?? 0;
         return rows;
 
 
     } catch (err) {
         console.error('Error updating employee:', err);
+        throw err;
+    }
+}
+
+export async function insertEmployeeDb(employeeData: EmployeeData): Promise<number> {
+    const { UserID, RestaurantID, Salary, HireDate, SupervisorID, EmployeeType } = employeeData;
+    try {
+        const pool = await connectDB();
+        const request = pool.request();
+        request.input('UserID', sql.Int, UserID);
+        request.input('RestaurantID', sql.Int, RestaurantID);
+        request.input('Salary', sql.Decimal(12, 2), Salary);
+        request.input('HireDate', sql.Date, new Date(HireDate));
+        request.input('SupervisorID', sql.Int, SupervisorID ?? null);
+        request.input('EmployeeType', sql.NVarChar(50), EmployeeType);
+
+        const result = await request.execute('sp_InsertEmployee');
+
+        const rows = result.recordset?.[0]?.RowsAffected ?? 0;
+        return rows;
+    } catch (err) {
+        console.error('Error inserting employee:', err);
+        throw err;
+    }
+}
+
+export async function deleteEmployeeDb(userID: number): Promise<number> {
+    try {
+        const pool = await connectDB();
+        const request = pool.request();
+
+        request.input('UserID', sql.Int, userID);
+
+        const result = await request.execute('sp_DeleteEmployee');
+
+        const rows = result.rowsAffected[0] ?? 0;
+
+        return rows;
+    } catch (err) {
+        console.error('Error deleting employee:', err);
         throw err;
     }
 }

@@ -1,14 +1,20 @@
 import express, {Express} from 'express';
 import { connectDB } from './db';
 import employeeRoute from './src/routes/employeeRoute';
+import orderRoute from './src/routes/orderRoute';
+import billRoute from './src/routes/billRoute';
+import customerRoute from './src/routes/customerRoute';
 
 const app: Express = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5173;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/api', employeeRoute);
+app.use('/api', orderRoute);
+app.use('/api', billRoute);
+app.use('/api', customerRoute);
 
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
     console.error('Unhandled error:', err);
@@ -21,7 +27,7 @@ app.use((req: express.Request, res: express.Response) => {
 
 async function startApp() {
     try {
-        await connectDB();
+        await connectDB(); 
         app.listen(PORT, () => {
             console.log(`Server is running on port ${PORT}`);
         });
