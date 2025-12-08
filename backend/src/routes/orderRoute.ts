@@ -4,6 +4,7 @@ import e from 'express';
 
 const router = express.Router();  
 
-router.get('/orders/customer/:customerName', getOrderByCustomer);
+router.get('/orders/customer', getOrderByCustomer);
+
 
 export default router;

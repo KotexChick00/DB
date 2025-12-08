@@ -3,7 +3,12 @@ import { getOrderByCustomerDb } from '../services/orderService';
 
 export async function getOrderByCustomer(req: Request, res: Response): Promise<void> {
 
-    const customerName: string = req.params.customerName;
+    const customerName = req.query.customerName as string;
+
+    if (!customerName) {
+        res.status(400).json({ message: "Thiếu customerName" });
+        return;
+    }
 
     try {
         const orders = await getOrderByCustomerDb(customerName);
@@ -13,3 +18,4 @@ export async function getOrderByCustomer(req: Request, res: Response): Promise<v
         res.status(500).json({ message: 'Lỗi khi lấy đơn hàng theo tên khách hàng.' });
     }
 }
+
