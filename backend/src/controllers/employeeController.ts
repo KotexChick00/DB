@@ -7,9 +7,37 @@ export async function updateEmployee(req: Request, res: Response): Promise<void>
     const { UserID, RestaurantID, Salary, HireDate, EmployeeType } = employeeData;
 
     // 1. Validate input
-    if (!UserID || !RestaurantID || !Salary || !HireDate || !EmployeeType) {
+    if (!UserID) {
         res.status(400).json({
-            message: 'Thiếu các trường bắt buộc (UserID, RestaurantID, Salary, HireDate, EmployeeType).'
+            message: 'Thiếu trường bắt buộc: UserID.'
+        });
+        return;
+    }
+
+    if (!RestaurantID) {
+        res.status(400).json({
+            message: 'Thiếu trường bắt buộc: RestaurantID.'
+        });
+        return;
+    }
+
+    if (!Salary) {
+        res.status(400).json({
+            message: 'Thiếu trường bắt buộc: Salary.'
+        });
+        return;
+    }
+
+    if (!HireDate) {
+        res.status(400).json({
+            message: 'Thiếu trường bắt buộc: HireDate.'
+        });
+        return;
+    }
+
+    if (!EmployeeType) {
+        res.status(400).json({
+            message: 'Thiếu trường bắt buộc: EmployeeType.'
         });
         return;
     }

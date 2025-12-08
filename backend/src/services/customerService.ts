@@ -19,3 +19,17 @@ export async function getTotalSpentByCustomerDb(customerID: number): Promise<num
         throw err;
     }
 }
+
+export async function getAllCustomersDb(): Promise<any[]> {
+    try {
+        const pool = await connectDB();
+        const request = pool.request();
+        const result = await request.query(`
+            SELECT * FROM Customer;
+        `);
+        return result.recordset;
+    } catch (err) {
+        console.error('Error fetching all customers:', err);
+        throw err;
+    }
+}
