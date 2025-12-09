@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { Search, Plus, Edit2, Key, UserX, Loader2, Trash } from 'lucide-react';
+import { Search, Plus, Edit2, Key, Loader2, Trash } from 'lucide-react';
 
 // Cấu trúc dữ liệu JSON thuần
 interface Employee {
@@ -69,7 +69,6 @@ export function EmployeeManagement() {
       try {
         // Thực hiện lệnh gọi API
         const response = await fetch(API_URL);
-
         if (!response.ok) {
           throw new Error(`Lỗi HTTP: ${response.status}`);
         }

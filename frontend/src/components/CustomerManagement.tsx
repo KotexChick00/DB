@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 // Đã thêm X và XCircle để sử dụng trong modal
-import { Search, List, Download, BadgeDollarSign, X, XCircle } from "lucide-react"; 
+import { Search, List, Download, BadgeDollarSign, X, XCircle } from "lucide-react";
 
 // ---- KIỂU DỮ LIỆU ĐÚNG THEO BACKEND ----
 interface Customer {
@@ -17,11 +17,11 @@ interface TotalSpentResult {
 
 // 1. KIỂU DỮ LIỆU CHO ĐƠN HÀNG (Dựa trên kết quả curl)
 interface Order {
-    Order_ID: number;
-    FName: string;
-    Status: string;
-    TimeCreated: string;
-    Channel: string;
+  Order_ID: number;
+  FName: string;
+  Status: string;
+  TimeCreated: string;
+  Channel: string;
 }
 
 export function CustomerManagement() {
@@ -65,8 +65,8 @@ export function CustomerManagement() {
       .then(res => res.json())
       .then((data: Order[]) => {
         setOrdersModalData({
-            customerName: name,
-            orders: data,
+          customerName: name,
+          orders: data,
         });
         setShowOrdersModal(true); // Mở modal đơn hàng
       })
@@ -84,9 +84,97 @@ export function CustomerManagement() {
   );
 
   // ... (Các hàm exportCSV, exportCSVWithSpent, downloadCSV giữ nguyên)
-  const exportCSV = () => { /* ... */ };
-  const exportCSVWithSpent = async () => { /* ... */ };
-  const downloadCSV = (content: string, filename: string) => { /* ... */ };
+  // ---- CSV EXPORT (basic) ----
+
+  const exportCSV = () => {
+
+    const header = "Customer_ID,User_ID,FName,Phone\n";
+
+
+
+    const rows = customers
+
+      .map((c) => `${c.Customer_ID},${c.User_ID ?? ""},${c.FName},${c.Phone}`)
+
+      .join("\n");
+
+
+
+    const csvContent = header + rows;
+
+
+
+    downloadCSV(csvContent, "customers.csv");
+
+  };
+
+
+
+  // ---- CSV EXPORT (kèm totalSpent) ----
+
+  const exportCSVWithSpent = async () => {
+
+    let header = "Customer_ID,User_ID,FName,Phone,Total_Spent\n";
+
+    let rows = "";
+
+
+
+    for (const c of customers) {
+
+      try {
+
+        const res = await fetch(
+
+          `/api/customer/${c.Customer_ID}/total-spent`
+
+        );
+
+        const spent: TotalSpentResult = await res.json();
+
+
+
+        rows += `${c.Customer_ID},${c.User_ID ?? ""},${c.FName},${c.Phone},${spent.totalSpent
+
+          }\n`;
+
+      } catch (err) {
+
+        rows += `${c.Customer_ID},${c.User_ID ?? ""},${c.FName},${c.Phone},0\n`;
+
+      }
+
+    }
+
+
+
+    downloadCSV(header + rows, "customers_with_total_spent.csv");
+
+  };
+
+
+
+  // ---- Helper download ----
+
+  const downloadCSV = (content: string, filename: string) => {
+
+    const blob = new Blob([content], { type: "text/csv;charset=utf-8;" });
+
+    const url = URL.createObjectURL(blob);
+
+
+
+    const link = document.createElement("a");
+
+    link.href = url;
+
+    link.setAttribute("download", filename);
+
+    link.click();
+
+  };
+
+
 
 
   return (
@@ -208,55 +296,54 @@ export function CustomerManagement() {
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 p-4">
           <div className="bg-white rounded-xl p-6 max-w-3xl w-full">
             <div className="flex justify-between items-center mb-4 border-b pb-3">
-                <h2 className="text-xl font-bold text-gray-900">
-                    Đơn hàng của khách: {ordersModalData.customerName}
-                </h2>
-                <button
-                    onClick={() => setShowOrdersModal(false)}
-                    className="p-1 text-gray-400 hover:text-gray-700"
-                >
-                    <X size={24} />
-                </button>
+              <h2 className="text-xl font-bold text-gray-900">
+                Đơn hàng của khách: {ordersModalData.customerName}
+              </h2>
+              <button
+                onClick={() => setShowOrdersModal(false)}
+                className="p-1 text-gray-400 hover:text-gray-700"
+              >
+                <X size={24} />
+              </button>
             </div>
 
             {ordersModalData.orders.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                    <XCircle className="mx-auto mb-2 text-red-400" size={32} />
-                    <p>Không tìm thấy đơn hàng nào của khách hàng này.</p>
-                </div>
+              <div className="text-center py-8 text-gray-500">
+                <XCircle className="mx-auto mb-2 text-red-400" size={32} />
+                <p>Không tìm thấy đơn hàng nào của khách hàng này.</p>
+              </div>
             ) : (
-                <div className="overflow-x-auto max-h-96">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50 sticky top-0">
-                            <tr>
-                                <th className="text-left py-3 px-4 text-gray-600 text-sm">Mã đơn</th>
-                                <th className="text-left py-3 px-4 text-gray-600 text-sm">Thời gian tạo</th>
-                                <th className="text-left py-3 px-4 text-gray-600 text-sm">Kênh</th>
-                                <th className="text-left py-3 px-4 text-gray-600 text-sm">Trạng thái</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-100">
-                            {ordersModalData.orders.map((order) => (
-                                <tr key={order.Order_ID} className="hover:bg-gray-50">
-                                    <td className="py-3 px-4 font-medium text-orange-600">#{order.Order_ID}</td>
-                                    <td className="py-3 px-4 text-gray-900">
-                                        {new Date(order.TimeCreated).toLocaleString('vi-VN')}
-                                    </td>
-                                    <td className="py-3 px-4 text-gray-900">{order.Channel}</td>
-                                    <td className="py-3 px-4">
-                                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                            order.Status === 'Completed' ? 'bg-green-100 text-green-700' :
-                                            order.Status === 'Pending' ? 'bg-yellow-100 text-yellow-700' :
-                                            'bg-red-100 text-red-700'
-                                        }`}>
-                                            {order.Status}
-                                        </span>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+              <div className="overflow-x-auto max-h-96">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50 sticky top-0">
+                    <tr>
+                      <th className="text-left py-3 px-4 text-gray-600 text-sm">Mã đơn</th>
+                      <th className="text-left py-3 px-4 text-gray-600 text-sm">Thời gian tạo</th>
+                      <th className="text-left py-3 px-4 text-gray-600 text-sm">Kênh</th>
+                      <th className="text-left py-3 px-4 text-gray-600 text-sm">Trạng thái</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {ordersModalData.orders.map((order) => (
+                      <tr key={order.Order_ID} className="hover:bg-gray-50">
+                        <td className="py-3 px-4 font-medium text-orange-600">#{order.Order_ID}</td>
+                        <td className="py-3 px-4 text-gray-900">
+                          {new Date(order.TimeCreated).toLocaleString('vi-VN')}
+                        </td>
+                        <td className="py-3 px-4 text-gray-900">{order.Channel}</td>
+                        <td className="py-3 px-4">
+                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${order.Status === 'Completed' ? 'bg-green-100 text-green-700' :
+                              order.Status === 'Pending' ? 'bg-yellow-100 text-yellow-700' :
+                                'bg-red-100 text-red-700'
+                            }`}>
+                            {order.Status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
 
             <div className="mt-6 text-right">
